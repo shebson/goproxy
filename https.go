@@ -263,7 +263,9 @@ func (proxy *ProxyHttpServer) handleHttps(w http.ResponseWriter, r *http.Request
 			ctx.Logf("Exiting on EOF")
 		}()
 	case ConnectProxyAuthHijack:
-		proxyClient.Write([]byte("HTTP/1.1 407 Proxy Authentication Required\r\nProxy-Authenticate: Basic realm=\"usefixie.com\"\r\n"))
+		var response = NewForbiddenResponse(ctx.Req, "usefixie.com");
+		response.Write(proxyClient);
+
 		todo.Hijack(r, proxyClient, ctx)
 	case ConnectReject:
 		if ctx.Resp != nil {
