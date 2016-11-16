@@ -27,6 +27,23 @@ func NewResponse(r *http.Request, contentType string, status int, body string) *
 	return resp
 }
 
+func NewForbiddenResponse(req *http.Request, realm string) *http.Response {
+	var unauthorizedMsg = []byte("407 Proxy Authentication Required")
+	var response = &http.Response{
+		StatusCode:    407,
+		ProtoMajor:    1,
+		ProtoMinor:    1,
+		Request:       req,
+		Header:        http.Header{
+			"Proxy-Authenticate": []string{"Basic realm=" + realm},
+			"Connection": []string{"close"},
+			},
+		Body:          ioutil.NopCloser(bytes.NewBuffer(unauthorizedMsg)),
+		ContentLength: int64(len(unauthorizedMsg)),
+	}
+	return response
+}
+
 const (
 	ContentTypeText = "text/plain"
 	ContentTypeHtml = "text/html"
